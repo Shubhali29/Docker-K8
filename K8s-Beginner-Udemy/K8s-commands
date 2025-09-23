@@ -1,3 +1,6 @@
 1. kubectl run <app-name> -> deploy an app
 2. kubectl cluster-info -> to get info of cluster
 3. kubectl get nodes -> List all nodes of a cluster.
+4. kubectl get pods -> to get list of all pods
+5. kubectl get pods -o wide -> It will show list of pods with details of node IP and name
+6. kubectl describe pod <nameofpod> -> to get all details of a pod

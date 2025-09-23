@@ -1,0 +1,38 @@
+Yaml
+---------
+1. Key value
+    Example : Fruit: Apple
+2. List
+    Example:
+        Fruits:
+            - Apple
+            - Banana
+3. Dictionary
+    Example:
+        Employee:
+            Name: Jacob
+            Age: 30
+            Sex: Male
+4. List inside dict
+    Example:
+        Employee:
+            Name: Jacob
+            Age: 30
+            Sex: Male  
+            Projects:
+                - Automation
+                - Support
+5. List of Dict
+     Example:
+        Employee:
+            Name: Jacob
+            Age: 30
+            Sex: Male  
+            Projects:
+                - Automation
+                - Support
+            Payslips:
+                - Month: July
+                  Wage: 4000
+                - Month: August
+                  Wage: 9000

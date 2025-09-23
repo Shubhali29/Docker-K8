@@ -115,4 +115,34 @@ kubelet: The agent running on all nodes that manages containers and communicates
 kubectl: The command-line interface for interacting with the cluster (usually needed on master or admin machines, but often installed on all nodes).
 
 
+Setting up K8s 
+----------------
+1. Local 
+    - Docker Desktop
+    - Minikube - Single Node -> All K8s components packaged under one ISO image. For minikube installation system should have virtualization enabled.
+    - kubeadm -> Multi Node setup
+
+2. Cloud Providers
+    - GCP - GKE
+    - AWS - EKS
+    - Azure - AKS
+
+3. Playground
+    - KubeKloud
+
+
+** Docker Desktop has inbuilt K8s cluster and Kubectl
+
+
+Pod
+-----------
+1. K8s does not deploy Container directly on the worker nodes
+2. Containers are encapsulated inside K8s object known as Pods.
+3. A Pod is a single instance of an application
+4. Pod is a smallest object that you can create in K8s cluster.
+5. Pods have 1:1 relationship with container running your application.
+6. To scale up, new pods are created and to scale down, existing pods are deleted.
+7. You do not add new containers of application in existing pods.
+8. A pod can have multiple containers but not of same kind.
+9. A Pod (as in a pod of whales or pea pod) is a group of one or more containers, with shared storage and network resources, and a specification for how to run the containers.s
 
