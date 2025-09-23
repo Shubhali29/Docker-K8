@@ -1,0 +1,118 @@
+Kubernetes 
+-----------------
+1. Its an container orchestration technology that manages and deploy thousands of containers in a cluster.
+2. With the help container orchestration
+    - Application will be highly available
+    - Containers can be scale up or down as per load.
+
+Kubernetes Architecture
+------------------------------
+1. Kubernetes has master slave architecture
+2. Node is a VM where containers run
+2. Node is called master if it has following K8s components
+    - Controller
+    - etcd
+    - Scheduler
+    - API server
+3. Node is called slave if it has following K8s components
+    - Container Runtime software - Docker
+    - Kubelet
+
+4. Collection of Nodes is called K8s cluster.
+5. Kubectl is command line utility to interact with K8s cluster.
+
+To work with other container runtime
+----------------------------------------
+1. K8s introduces an interface CRI (Container Runtime Interface)
+2. The vendor should adhere to OCI [Open Container Initiative]
+    - imagespec - define how image should be built
+    - runtimespec - how the application container will be deployed
+3. To support Docker, K8s has dockershim outside the CRI
+4. Docker runtime support was removed from Kubernetes from version v1.24. dockershim was removed.
+5. But as Docker follows imagespec that comes under OCI standard. So docker images continue to work with containerD.
+
+containerD CLI tools:
+--------------------------
+1. ctr -> for debugging containerD
+2. nerdcll -> similar to Docker CLI
+
+crictl : Provides cli for CRI compatible conatiner runtimes
+
+
+** Kubernetes does not use the Docker runtime internally anymore, but Docker images continue to run on Kubernetes using alternative CRI-compliant runtimes. Docker is still valuable for building containers; Kubernetes just uses more direct, efficient methods for running them
+
+
+** Dockershim allowed Kubernetes to communicate with and control Docker Engine as its container runtime, even though Docker didn’t natively support the CRI standard. It translated Kubernetes commands and requests (using the CRI protocol) into Docker API calls so containers could still be managed strictly through Docker
+
+** Yes, in modern Kubernetes clusters (from version 1.24 onward), the Docker daemon (dockerd) is typically not installed or required on worker nodes. Instead, worker nodes use a Container Runtime Interface (CRI)-compliant runtime like containerd or CRI-O to run containers
+
+
+Installation of K8s Components
+----------------------------------------
+Installing Control Plane Components
+--------------------------------------------------
+kubeadm init:
+On the machine set to become the control plane, the kubeadm init command is used. This bootstraps the cluster by installing:
+
+kube-apiserver
+
+kube-scheduler
+
+kube-controller-manager
+
+etcd (or connects to an external etcd, in HA setups)
+
+The services are typically managed as systemd services or as static pods defined in manifest files stored under /etc/kubernetes/manifests.
+
+Certificates, networking, and bootstrap configuration are all automated by kubeadm, ensuring secure cluster communication and setup.
+
+Installing Worker Node Components
+----------------------------------------------
+kubeadm join:
+Each worker node must first install kubelet, kube-proxy, and a container runtime (like containerd).
+
+The administrator then joins each worker node to the cluster by running a join command (kubeadm join ...) generated during the control plane setup.
+
+
+kubeadm init will run on master node but where this kubeadm join will run and how it will know which node is need to register with cluster?
+---------------------------------------------------------------------------------------------------------------
+The kubeadm join command runs on the node that you want to add to the existing Kubernetes cluster—this could be a worker node or an additional control plane node.
+
+How does kubeadm join know which cluster to register with?
+When you run kubeadm init on the master node, it generates:
+
+A bootstrap token (a shared secret) for secure communication.
+
+The API server’s IP or DNS endpoint (e.g., k8smaster:6443).
+
+The CA certificate hash that the joining node will use to verify the cluster’s identity.
+
+You either get the complete kubeadm join command from the output of kubeadm init or generate it later via commands like kubeadm token create --print-join-command.
+
+This join command contains the necessary information—API server address, token, CA certificate hash—to securely authenticate the joining node with the cluster control plane.
+
+What happens on the join node?
+You run the generated kubeadm join command on the new node.
+
+The join node uses the token and CA hash to:
+
+Discover the cluster API server.
+
+Authenticate securely using TLS bootstrap.
+
+Register itself as a new node with the Kubernetes control plane.
+
+After successful join, kubelet on the new node is configured to communicate with the control plane API server and starts managing pods as per cluster schedules.
+
+
+
+** What needs to be installed on all nodes?
+----------------------------------------------------
+kubeadm: The tool used to bootstrap and manage the cluster setup.
+
+kubelet: The agent running on all nodes that manages containers and communicates with the control plane.
+
+kubectl: The command-line interface for interacting with the cluster (usually needed on master or admin machines, but often installed on all nodes).
+
+
+

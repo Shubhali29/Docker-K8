@@ -1,0 +1,44 @@
+Containers
+-----------------
+1. Containerized Applications - Run each service with its own dependencies  (Libraries + dependencies) in separate containers. 
+2. Containers - They are completely isolated environments as in they can have their own services, processes, network interfaces and their own mounts like vitual machine except they all share the common kernel os.
+3. Different types of containers:
+    - LXC 
+    - LXD
+    - Lcfs
+
+4. Docker utilizes LXC containers
+5. The main purpose of Docker is to package and containerize various applications and to ship them, to run them anywhere, anytime and as many times as you want.
+
+What is OS ?
+- OS has two components 
+    - OS kernel
+    - Software
+
+- Softwares make the OS different but underlying OS kernel remain same like fedora, susi, ubuntu all have underlying OS kernel Linux. 
+
+- On Linux underlying OS kernel we can run any container with software that supports linux like ubuntu, fedora containers. But windows container cannot be run on it. 
+
+
+VMs and Docker
+----------------
+1. VMs has hyperviser. They have their own OS kernel.
+   Docker has common OS kernel. 
+2. VMs has complete isolation
+    Docker has less isolation as they shre same infra and OS
+3. VM's take more time in bootup
+    Docker containers are lightweight so their boot up time is low.
+
+Note: We can use VM's with containers. Less VM's will be provisioned to run thousands of container.
+
+Container Vs Images
+------------------------
+1. Images are templates of container.
+2. Containers are running instance of images that are isolated and have their own environments.
+
+
+** Docker and LXC (Linux Containers) leverage the same Linux kernel features—cgroups (For allocating resources) and namespaces (For process isolation) — for lightweight, isolated environments. 
+
+** Namespaces isolate what resources a container sees (processes, network, user IDs, etc.) so it appears like an independent system.
+
+** Cgroups control how much CPU, memory, and other resources a container can use.
