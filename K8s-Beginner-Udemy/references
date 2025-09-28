@@ -1,0 +1,10 @@
+Reference
+-----------------
+Link to kubeadm installation instructions: https://kubernetes.io/docs/setup/independent/install-kubeadm/
+Install and set up the kubectl tool: - https://kubernetes.io/docs/tasks/tools/
+Install Minikube: -https://minikube.sigs.k8s.io/docs/start/
+
+Notes Link
+----------
+1. https://notes.kodekloud.com/docs/kubernetes-for-the-absolute-beginners-hands-on-tutorial/Introduction/Introduction
+2. https://notes.kodekloud.com/docs/CKA-Certification-Course-Certified-Kubernetes-Administrator/Introduction/Course-Introduction

@@ -144,5 +144,89 @@ Pod
 6. To scale up, new pods are created and to scale down, existing pods are deleted.
 7. You do not add new containers of application in existing pods.
 8. A pod can have multiple containers but not of same kind.
-9. A Pod (as in a pod of whales or pea pod) is a group of one or more containers, with shared storage and network resources, and a specification for how to run the containers.s
+9. A Pod (as in a pod of whales or pea pod) is a group of one or more containers, with shared storage and network resources, and a specification for how to run the containers.
+10. Pods are "created and managed" by ReplicaSets or Deployments, not recommended to be managed directly for production workloads.
+
+
+K8s with Yaml file
+-----------------------
+1. K8s yaml file must have following properties:
+    - apiVersion - version of K8s
+    - kind - Type of object you are creating like pod, service, deployment, replicaSet
+    - metadata - meta data for the object like name, label that can be used for filter
+    - spec - Specify the details of container like name and image
+2. K8s is case sensitive
+
+Kind        |  apiVersion
+----------------------
+Pod         |  v1
+Service     |  v1
+ReplicaSet  |  apps/v1
+Deployment  |  apps/v1
+
+
+
+Replication Controller
+----------------------------
+1. Replication Controller make sure a specified number of pods should be running at all times.
+2. Replication controller and ReplicaSet are almost same but ReplicaSet is new version.
+3. ReplicaSet is the modern controller, supporting more flexible label selectors (Equality and set based) and is best used as part of Deployments, while ReplicationController is older and limited to simple matching—recommended only for backward compatibility.
+4. Labels of pod will be provided to replicaSet matchLables property, this will help ReplicaSet to identify which pods to moniter.
+5. Typically, you do not create ReplicaSets directly; they are created and managed by Deployments.
+
+
+
+K8s Hierarchy
+-----------
+Deployment -> ReplicaSet -> Pods (Container)
+
+Deployment
+-----------------
+1. Deployment helps to do version upgrades seamlessly, Rolling updates in case of failures.
+2. Deployment will create replicaSet with pods.
+3. Rolling update is the default deployment strategy
+4. Deployment strategy:
+    - Recrete
+    - Rolling Update
+5. Manages ReplicaSets and enables declarative updates (such as rolling updates and rollbacks) for Pods.
+
+
+
+Networking in K8s
+----------------------
+1. Node has IP address
+2. IP address is assigned to Pod.
+3. All Containers/Pods can communicate one another without NAT
+4. All Nodes can communicate with all containers without NAT
+5. Pre built networking solutions are:
+    - Cilium
+    - Big Cloud fabric
+    - flannel
+    - VMware
+    - NZXT
+    - calcico
+
+
+Services in K8s
+------------------
+1. Service is just like K8s kind like pod, deployment etc
+2. Service types:
+    - Node Port -> Accepts a request on Node Port and then Node forward that request to port on which container is running.
+    - Cluster IP
+    - Load Balancer
+4. Node Port can range from 30000 to 32767.
+5. NodePort service is useful for accessing service from outside.
+6. For communication between Pods, clusterIP is used.
+7. If type is not defined then by default ClusterIP is the service type.
+8. Not part of the Pod/ReplicaSet/Deployment ownership hierarchy, but is used to expose a set of Pods as a network service.
+9. Selects Pods (using label selectors) and provides stable networking, load balancing, and discovery.
+10. Services do not manage Pods or ReplicaSets themselves, but allow networking access to them
+
+
+Deployment
+    └── ReplicaSet(s)
+            └── Pod(s)
+Service (selects Pods label, but no direct ownership)
+
+
 

@@ -1,0 +1,51 @@
+etcd
+-----------
+1. It is distributed key value store 
+2. Default port is 2379
+3. Command line is etcdcli
+4. etcd store info about cluster
+    - Nodes
+    - Pods
+    - Configs
+    - Secrets
+    - Accounts
+    - Roles
+    - Bindings
+    - Others
+
+
+Kube API server
+-------------------
+1. It is the primary management component in K8s cluster
+2. When we run kubectl command it send request to kube api server. KubeAPI server first authenticate and validate the request and then fetch details from ETCD and send it to user.
+3. When pod creation request is sent to KubeAPI server
+    - KubeAPI server authenticate and validate the request
+    - Interact with etcd to update the details of new pod creation
+    - KubeAPI sends back to user that pod is created
+    - Kube scheduler keep monitoring KubeAPI server. IT sense that a new pod creation request is arrived. SO it identifies the best suited node for that and send info to KubeAPI server.
+    - Now KubeAPI server update same in ETCD 
+    - KubeAPI then interact with Kubelet to create new pod. 
+    - Kubelet will create new pod using container runtime
+    - Once created response back to KubeAPI.
+    - KubeAPI again update the etcd.
+
+Kube Controllers
+-----------------------
+1. There are various type of controllers
+    - Node controller - Keep checking health of node via KubeAPI server
+    - Replication controller - keep checking replicas are running as per configuration.
+
+Kube Scheduler
+----------------
+1. Reponsible for scheduling pods and nodes
+2. It only decides which pod will go on which node.
+
+Kubelet
+--------------
+1. Instructs the container runtime to pull image and create container
+2. After that it keeps monitoring the state of pod and send back report to KubeAPI server periodically
+
+KubeProxy
+-------------------
+1. Is the process that runs on each node of K8s cluster
+2. Its job to look for new services. Everytime a new service is created. It creates the appropiate rules on each node to forward traffic to those services to backend services. One way to do this is using iptables rules

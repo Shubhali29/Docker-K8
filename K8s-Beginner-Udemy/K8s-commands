@@ -4,3 +4,16 @@
 4. kubectl get pods -> to get list of all pods
 5. kubectl get pods -o wide -> It will show list of pods with details of node IP and name
 6. kubectl describe pod <nameofpod> -> to get all details of a pod
+7. kubectl delete pod <podname> -> to delete a pod
+8. kubectl run redis --image=redis --dry-run=client -o yaml > redis.yaml
+9. kubectl get replicaset
+10. kubectl scale --replicas=6 -f replica.yaml -> to scale replicas
+11. kubectl delete replicaset <name>
+12. kubectl get all -> to get all details of deployment
+13 kubectl apply -f <updated yaml file> -> for updating deployments
+14 kubectl set image <file name> <name of container>=<newimage>
+15 kubectl rollout status <deployment_name>
+16 kubectl rollout histroy <deployment_name>
+17 kubectl rollout undo <deployment_name>
+18. kubectl edit deployment
+19. kubectl describe service <name>

@@ -1,0 +1,28 @@
+apiVersion: appps/v1
+kind: ReplicaSet
+metadata:
+  name: my-app-pod
+  labels: 
+    app: my-app
+    type: front-end
+
+spec:
+  template:
+    metadata: 
+      name: my-app-pod
+      labels:
+        app: my-app
+        type: front-end
+    spec:
+      containers:
+        - name: nginx-container
+          image: nginx
+        - name: postgres
+          image: postgres
+          env: 
+          - name: POSTGRES_PASSWORD
+            value: mysecretpassword
+  replicas: 3
+  selector:
+    matchLabels:
+      type: front-end
