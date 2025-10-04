@@ -49,3 +49,29 @@ KubeProxy
 -------------------
 1. Is the process that runs on each node of K8s cluster
 2. Its job to look for new services. Everytime a new service is created. It creates the appropiate rules on each node to forward traffic to those services to backend services. One way to do this is using iptables rules
+
+
+Namespace
+------------
+1. Namespaces created by k8s once cluster is up
+    - default
+    - kube-public
+    - kube-system
+2. It gives you kind of isolation for same pods for different env like dev pods and prod pods
+3. To access service of another workspace we need to append namespace name
+    like db-service.dev.svc.cluster.local
+    here dev is namespace
+4. kubectl commands bt default give output of default namespace. For accessing resources of particular namespace use --namespace=<name> flag.
+5. In yaml file namespace can be provided under metadata section
+6. For creating quotas like max number of pods for namepace, create resource of kind ResourceQuota
+
+
+Imperative and Declarative
+---------------------------
+1. Imperative - Provide step by step instructions
+   Declarative - Just provide final destination
+2. Imperative - In terms of K8s, Kubectl create, run, delete, scale, set image all lie in Imperative approch
+   Declarative - In terms of K8s, kubectl appy command handle all create, update and delete of resources. It checks the current config and Identify what changes needs to be done in system.
+
+
+- Kubectl appy command compare local file, last config file and live config file.

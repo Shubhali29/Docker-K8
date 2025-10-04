@@ -4,3 +4,20 @@ etcdctl snapshot save
 etcdctl endpoint health
 etcdctl get
 etcdctl put
+
+
+kubectl
+-------
+1. kubectl config set-context $(kubectl config current-context) --namespace=dev
+
+
+Taint commands
+--------------
+1. kubectl taint nodes node-name key=value:taint-effect
+   here taint-effect can be three types
+        - NoSchedule - No new pod will be schedule on this node
+        - PreferNoSchedule - system will not schedule pod on this node but do not gurantee
+        - NoExecute  - No new pod will be schedule on this node and existing will be evicted if they are not taint tolerant
+
+
+- kubectl label node <node-name> <key>=<value> -> To label a node

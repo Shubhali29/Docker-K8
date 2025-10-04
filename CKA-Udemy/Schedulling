@@ -1,0 +1,130 @@
+1. Scheduler serach for a property "nodeName" to identify which pod wants to schedule
+2. After that it identifies the node and nodeName to pod.
+
+Manual Scheduling
+----------------------
+Assume: K8s cluster does not have schedular.
+Note: if nodeName is not mentioned in pod manifest file then it will remain in pending state.
+
+1. To assign node to a Pod. Add nodeName in pod manifest file.
+2. In case pod is already created and I want to assign node to it. Then use binding.
+   and send post request
+
+Lables and Selectors:
+-----------------------
+1. Labels and Selectors are used to group and select objects
+2. Labels are used to group resources
+3. Selectors are used with labels to filter them
+
+- Annotations are used for storing other information like tool details, contact details that may be used for some kind of integration.
+
+Taints and Tolerance
+----------------------
+1. These are used to set restrictions what pods can be scheduled on a node.
+2. Taints are set on Node and Tolerance are set on Pods
+     - Add tolerations section under spec property
+     - toleration will be list of taint params
+     - key, operator, value and effect
+3. taints and tolerance do not tell pods to go to specific node. Instead it just tell node to only accept pods with certain tolerance
+
+Note: Schedular never schedule a pod on master node. because a special taint is applied on masternode that restricts any pod schedule.
+
+Node Selector
+----------------
+1. To schedule a Pod on a particuler node, add "nodeSelector" in pod yaml file
+   -> Under spec property add 
+      nodeSelector:
+         lable-key-of-node: value-of-node-label
+
+Node Affinity
+------------------
+1. Primary goal is to place pod on a particular node
+2. It can be achieved using node selector but advanced expression like and, or not cannot be provided using node selector
+3. Add affinity property inside spec property
+  - affinity:
+      nodeAffinity:
+         requiredDuringSchedulingIgnoredDuringExecution:
+           nodeSelectorTerms:
+           - matchExpressions:
+               - key: <node label>
+                 operator: In/NotIn/Exists
+                 values:
+                   - Large
+                   - Medium
+4. Available node affinity types
+   - requiredDuringSchedulingIgnoredDuringExecution
+   - preferredDuringSchedulingIgnoredDuringExecution
+
+
+Resource Limit
+------------------
+1. At the time of Pod creation we can specify required number of resources for pod like CPU and memory
+2. We can also limit the cpu and memory being used by Pod
+3. Add resources property inside containers property
+
+spec:
+   containers:
+      - name: nginx
+        image: nginx
+        resources:
+         requests:
+            cpu: 2
+            memory: "2Gi"
+         limits:
+            cpu: 1
+            memory: "1Gi"
+
+4. If any pod tries to access more CPU then limit provided then system throttles the CPU so that it will not go beyond the specified limit.
+5. A pod can access more memory than limit assigned. If any pod tries to access more memory then its limit constantly then pod will be terminated with with an error out of memory
+6. By default k8s does not put any limit on CPU and Memory usage by a Pod. If you want that then use LimitRange at the namespace resource. At the time of namespace creation you can define cpu and memory limits for all containers using limitRange
+
+Imp points
+----------------
+you CANNOT edit specifications of an existing POD other than the below.
+
+spec.containers[*].image
+
+spec.initContainers[*].image
+
+spec.activeDeadlineSeconds
+
+spec.tolerations
+
+DaemonSets
+----------
+1. Its like Replicaset
+2. It make sure that one instance of a pod should be running on all nodes.
+3. Examples like monitoring pod, logs pod
+4. It has same code as ReplicaSet only kind will be updated to "DaemonSet"
+
+Static Pods
+---------------------
+1. If there is no master node the kubelet will create the pod.
+2. But there is no API server then there is no instruction for kubelet to create pod
+3. First create a folder "etc/kubernetes/manifests" and keep all pod yaml file in it
+4. Kubelet will periodically check this folder and create the pods. These pods are called Static pods.
+5. Deployment, replicaset others cannot be created using kubelet only Pods can be created
+6. Usecase install kubelet on master and then create yaml files for api server, schedular etc and kubelet will create them. Kubeadm use this for creating master plane containers.
+7. Deploy control plane components as static pod.
+8. If a node hving kubelet is creating both static pod and pods through api server. Then kubectl cmd will show you list of all pods. But you can not change config of static pods
+
+
+Priority Classes
+----------------------
+1. They help us to define priority for different workloads, so that higher priority workloads always gets priority over lower priority ones.
+2. They are not attached to specific namespaces.
+3. Priority value ranges from positive 1 billion to negative 2 billion for apps
+4. Priority for k8s components is 1 billion to positive 2 billion. So that they will always get higher priority
+5. apiVersion for priority classes is "scheduling.k8s.io/v1"
+   example:
+   apiVersion: 
+   kind: PriorityClass
+   metadata:
+      name: high-priority
+   value: 1000000000
+   description: "Priority class for mission critical pods"
+   globalDefault: true // to make it default priority
+   preemptionPolicy: PreemptLowerPriority or never
+6. We can use this priority class in pod yaml file by adding "priorityClassName" under spec section.
+7. by default priority class of pod is 0
+8. If nodes do not have resources left for new pods and a higher priority pods needs to schedule. Then if preemptionPolicy is set to PreemptLowerPriority then it will kill lower priority pods and schedule new pods of higher priority. If it is set to never then new upcoming pods of higher priority will not preempt any pods and wait in scheduling queue.
