@@ -21,3 +21,12 @@ Taint commands
 
 
 - kubectl label node <node-name> <key>=<value> -> To label a node
+
+- kubectl get events -o wide -> for checking which schedular is picked.
+
+- kubectl exec kube-apiserver-controlplane -n kube-system -- kube-apiserver -
+h | grep enable-admission-plugins -> To see all enable-admission-plugins
+
+- kubectl -n webhook-demo create secret tls webhook-server-tls \
+    --cert "/root/keys/webhook-server-tls.crt" \
+    --key "/root/keys/webhook-server-tls.key"

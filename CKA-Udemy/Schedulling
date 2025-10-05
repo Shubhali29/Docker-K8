@@ -128,3 +128,49 @@ Priority Classes
 6. We can use this priority class in pod yaml file by adding "priorityClassName" under spec section.
 7. by default priority class of pod is 0
 8. If nodes do not have resources left for new pods and a higher priority pods needs to schedule. Then if preemptionPolicy is set to PreemptLowerPriority then it will kill lower priority pods and schedule new pods of higher priority. If it is set to never then new upcoming pods of higher priority will not preempt any pods and wait in scheduling queue.
+
+
+Multiple Schedulers
+--------------------------------
+1. Kubernetes can have multiple schedulars.
+2. It gives us freedom to create own alogorithm with some custom conditions and deploy it as schedular on controlplane of K8s.
+3. We can define which schedular to use in pod yaml file by adding schedularName property inside spec property.
+
+
+Scheduler Profiles:
+-------------------------
+1. How default scheduler works:
+   - Scheduling queue - pod is entered in queue for scheduling.
+   - Filtering - filter nodes that can be used for scheduling
+   - Scoring - find best node on which pod can be scheduled
+   - Binding - Pod get bind to the node
+2. Scheduling plugins
+   - Schedulling Queue - PrioritySort
+   - Filtering - NodeName, NodeResourceFit, NodeUnschedule
+   - Scoring - NodeResourceFit, ImageLocality
+   - Binding - DefaultBinder
+3. We can create own plugins and use them 
+4. Using Schedular Profiles we can disable and enable plugins for that schedular
+
+
+Admission Controllers
+-----------------------------
+1. When a request is sent to Kube API server using kubectl then 
+   - first authentication process is done using certificates stored in kube config file.
+   - Second RBAC authorization is performed to identify which user has what access as per role assigned to hime/her.
+2. If I want to apply some restrictions like we cannot download image from prublic repos then RBAC authorization cant be used.
+3. Here comes Admission controllers which helps us to implement better security measures to enforce how a cluster is used.
+4. Some admission controllers are:
+ - AlwaysPullImages
+ - Default Storage class
+ - EventRateLimit
+ - NamespaceExists
+ - NamespaceAutoProvision - Not enabled by default
+ 5. Admission controllers not only validate and reject requests from user, it can also perform operation in backend or change request itself
+6. Type of Admission Controllers:
+   - Validating Controllers - That can validate and reject the request like NamespaceExists
+   - Mutating Controllers - That can modify the object before getting creating Like DefaultStorageClass.
+   Note- Mutating admission controllers run first before validating admission controllers.
+7. K8s provide us functionality to create own admission controllers and those controllers will be enabled using MutatingAdmissionWebhook and ValidatingAdmissionWebhook controllers.
+   - first create the webhook server with your validation or mutation logic
+   - then create config for sending request to webhook server.
