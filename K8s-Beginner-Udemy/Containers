@@ -42,3 +42,8 @@ Container Vs Images
 ** Namespaces isolate what resources a container sees (processes, network, user IDs, etc.) so it appears like an independent system.
 
 ** Cgroups control how much CPU, memory, and other resources a container can use.
+
+
+Note: A container only lives until a process inside it is active
+
+Note: Entrypoint provides the executable and CMD provides default arguments

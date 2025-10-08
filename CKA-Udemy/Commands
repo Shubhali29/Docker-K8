@@ -30,3 +30,7 @@ h | grep enable-admission-plugins -> To see all enable-admission-plugins
 - kubectl -n webhook-demo create secret tls webhook-server-tls \
     --cert "/root/keys/webhook-server-tls.crt" \
     --key "/root/keys/webhook-server-tls.key"
+
+- kubectl rollout status <deployment name>
+- kubectl rollout history <deployment name>
+- kubectl rollout undo <deployment name>

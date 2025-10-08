@@ -1,0 +1,101 @@
+1. Deployment Strategy
+  - Recreate
+  - Rolling Update -> It is set by default
+
+2. Configure applications like: 
+  - Configuring env variables
+  - Configuring secrets
+  - Configuring Command and Arguments
+
+3. command instruction in pod yaml file ovverides the entrypoint command of docker image
+4. args instruction in pod yaml file ovverides the command of docker image
+
+5. ConfigMaps are used to pass configuration data in the form of key value pair in k8s
+
+6. Integrate secrets in pod
+   envFrom:
+     - secretRef:
+        name: <nameofsecret>
+
+7. Integrate ConfigMaps in pod:
+   envFrom: 
+     - configMapRef:
+        name: <nameofconfigmap>
+
+
+- Secrets are not encrypted, so it is not safer in that sense. However, some best practices around using secrets make it safer. As in best practices like:
+
+- Not checking-in secret object definition files to source code repositories.
+
+- Enabling Encryption at Rest [https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/] for Secrets so they are stored encrypted in ETCD. 
+
+
+
+Multi Containers Pods
+--------------------------
+- Multi container Pods design
+  - Co-located containers - which are dependent on each other like web and backend containers
+  - Init containers - that will start first before app containers. Once their job is done they got terminated and app containers starts
+  - Sidecar containers - that will start first like init containers but they dont terminate when their job is done
+- If we define multiple containers under containers property then all will start together. there is no particular order. This is Co-located containers design
+- If we add "initContainers" list like containers list under spec property then "initContainers" will start first
+- for Sidecar containers use "initContainers" property and define restartPolicy to always
+
+
+
+- Kubernetes supports self-healing applications through ReplicaSets and Replication Controllers. The replication controller helps in ensuring that a POD is re-created automatically when the application within the POD crashes. It helps in ensuring enough replicas of the application are running at all times.
+- Kubernetes provides additional support to check the health of applications running within PODs and take necessary actions through Liveness and Readiness Probes. 
+
+
+AutoScaling
+---------------------
+1. Horizontal AutoScaling
+  - Adding more instances of server.
+2. Vertical AutoScaling
+  - Adding more resource in existing server
+
+3. Scaling in terms of k8s
+  - Scaling Cluster Infra
+     - Horizontal
+        - Manual  - Create new Node and add in cluster using kubeadm join cmd.
+        - Automated - Cluster AutoScaler
+     - Vertical
+        - Manual - No approach
+        - Automated - 
+  - Scaling workloads
+    - Horizontal
+       - Manual - use kubectl scale cmd
+       - Automated - Horizontal Pod AutoScaler
+    - Vertical
+        - Manual - kubectl edit pod <podname> to increase resources
+        - Automated - Vertical Pod AutoScaler
+
+4. HPA - Horizontal Pod AutoScaler
+  - Automatically Observes Metrics
+  - Add or decrease Pods as per load
+  - Balances threshold
+  - Track multiple metrics
+  - Command - kubectl autoscale deployment <deployment-name> --cpu-percent=50 --min=1 --max=10
+  - Pre-requisite for HPA is Metric Server.
+  - HPA comes with k8s. No need to install
+  - No downtime
+
+5. In place pod resizing using resizePolicy.
+
+
+6. VPA - vertical pod AutoScaler
+  - Automatically Observes Metrics
+  - Increase resources of Pod
+  - Balances threshold
+  - VPA does not come with K8s. Installation is required
+  - VPA Pods
+    - VPA Recommender -> Observes metric and recommend what CPU and Memory changes are required
+    - VPA updater - It monitors the pod and if updation is required then it will terminate the Pod
+    - VPA Admission controller - It uses the recommendation from VPA Recommender and intervene the pod creation process so that pod will come up with new resource settings
+
+  - VPA modes
+     - Off
+     - Init
+     - Recreate
+     - Auto
+  - It involves downtime

@@ -1,0 +1,22 @@
+Logging and Monitoring
+---------------------
+1. How the resource comsumption is monitored in K8s
+2. Metrics like -
+    - How many nodes are there
+    - How many of them are healthy
+    - What is CPU, memory and disk utilization
+3. K8s does not provide montioring tool.
+4. But there are various opensource monitoring tools like:
+    - Metrics Server
+    - Prometheus
+    - Elastic Stack
+    - Datadog
+    - Dynatrace
+5. There is one metric server per cluster.
+6. Metric server is in memory monitoring tool. It does not have disk.
+7. Metric server collectes metric data from nodes through cAdvisor component of kubelet.
+8. After metric server deployment run below cmd to get the stats:
+    - kubectl top node
+    - kubectl top pod
+9. To see logs in k8s use cmd
+   -  kubectl logs <pod name>
