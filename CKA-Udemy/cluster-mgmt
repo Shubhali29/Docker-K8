@@ -1,0 +1,80 @@
+Cluster Maintenance
+-----------------------------
+
+1. Pod eviction timeout - If any pod goes down then master node waits for default time 5 mins. If pod doesn't come online then master node mark it as dead.
+    here 5 min is pod eviction timeout
+
+2. kubectl drain <node 1> - by this command all the pods running on this node move to other nodes
+
+   -> If a pod running on node is not part of replicaset then node can not be drained.
+
+3. kubectl uncordon <node1> - new pods can be sceduled on this node now
+
+4. kubectl cordon  <node1>  - no new pods can be scheduled on this node.
+
+   these commands are used for upgrades like OS upgrade, security patches etc.
+
+5. kubeadm upgrage plan
+
+6. kubeadm upgrade apply
+
+7. Kubeadm and kubeapi-server will have same version
+
+8. for upgrade, first kubeadm version is upgraded and then using kubeadm kubeapiserver and other components are upgraded.
+
+9. kubelet is not upgraded by kubeadm. We need to upgrade it manually.
+
+note: All k8s components except kubelet can have version less or equal than kube-api server. Kubelet can have same or less or greater version than kube-api server.
+
+
+Upgrade link: https://v1-33.docs.kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/
+
+10. kubectl get all --all-namespace -o yaml > all_service_deployments.yaml 
+
+11. HeptIO is used to take backup of K8s resource configs.
+
+
+12. etcdctl snapshot save snapshot.db
+    etcdctl snapshot status snapshot.db
+
+
+13. Backup using etcdctl:
+
+  - ETCDCTL_API=3 etcdctl \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+  --key=/etc/kubernetes/pki/etcd/server.key \
+  snapshot save /backup/etcd-snapshot.db
+
+  - etcdutl backup \
+  --data-dir /var/lib/etcd \
+  --backup-dir /backup/etcd-backup
+
+    (file based backup)
+
+
+
+14. etcdctl snapshot save is used for creating .db snapshots from live etcd clusters.
+
+15. etcdctl snapshot status provides metadata information about the snapshot file.
+
+16. etcdutl snapshot restore is used to restore a .db snapshot file.
+
+17. etcdutl backup performs a raw file-level copy of etcd’s data and WAL files without needing etcd to be running.
+
+
+ETCDCTL_API=3 etcdctl \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+  --key=/etc/kubernetes/pki/etcd/server.key \
+  snapshot save /opt/snapshot-pre-boot.db
+
+
+  ETCDCTL_API=3 etcdctl \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+  --key=/etc/kubernetes/pki/etcd/server.key \
+  snapshot restore /backup/etcd-snapshot.db
