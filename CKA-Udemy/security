@@ -1,0 +1,144 @@
+Security
+------------------------------
+
+Authentication
+-------------------
+1. Two types of users
+   - Admin
+   - Developer
+
+2. K8s does not have way to create user and manage them.
+
+3. Users can interact with K8s cluster using Kubectl or direct API calls.
+
+4. Both request will come at kube-api server. kube-api server has following way to authenticate user:
+   - by using static token file
+   - by using certificates
+   - by using third party Identity providers
+
+
+TLS Introduction
+------------------------
+1. Symmetric Encryption :  User encrypt the creds using secret key and server decrypt the creds using same key. But the key will be sent on same network and it can be sniffed by hacker.
+
+2. Asymmetric encryption: User generate a pair of private and public key. The public key will be configured on server and using my private key I can access server. 
+
+3. How secure communication using both asymmetric and symmetric encryption is performed:
+   - The main problem with symmetric encryption is that we are using same key for encrypt and decrpt the creds and user need to send the key to server for decryption. And hacker can easily sniff the key and creds. 
+   - To safely transfer the key to server following steps are performed:
+      - On server create a pub and private key pair using openssl. 
+      - Now when user sends https call. Server sends the public key to user. The hacker can sniff this public key.
+      - Now user will encrpt the key using this public key and sends back to server. 
+      - Now if user sniff this then he/she has only public key using which he can only encrypt the data but not decrypt the data because it does not have private key.
+      - Only server has the private key and it can decrypt the data.
+
+4. A user generates a key pair for secure ssh. 
+   A server generates a key pair for securing website
+   A CA generates a key pair for signining certificate.
+
+5. As you can see in point 3, hacker not able to decrpt the key used for communication between user and server.
+   - Now He will host its own website which looks like the actual website and try to get users cred.
+
+   - To handle this certificate comes into picture. 
+     - Each website is secured using certificates which are signed by authenticated CA's. Whose public certs present in browser to validate the certificates are correct or not.
+
+6. Certificates (Public key) - *.crt or *.pem
+   Private key - *.key or -*-key.pem
+
+
+7. Server certificates for servers in K8s cluster:
+   - kubeapi server - apiserver.crt, apiserver.key
+   - etcd server - etcdserver.crt, etcdserver.key
+   - kubelet server - kubelet.crt, kubelet.key
+
+8. Client certificates for clients in k8s cluster:
+   - Admin user interacting with kubeapi server - admin.crt, admin.key
+   - Schedular interacts with kubeapi server - schedular.crt, schedular.key
+   - Kube controller manager interacts with kubeapi server - controller-manager.crt, controller-manager.key
+   - kubeproxy interacts with kubeapi server - kube-proxy.crt, kube-proxy.key
+   - kubeapi server interacts with etcd server - it can use same pair or generate new pair for etcd server interaction.
+   - kubecpi server interacts with kubelet server - it can use same pair of certs or generate new pair for kubelet server interaction
+
+9. In K8s cluster, kube control manager can approve and sign the CSR. 
+   - kubectl get csr
+   - kubectl certificate approve <csr> 
+
+
+10. KubeConfig - Kube config file is used to provide all necessary details for connecting cluster otherwise user need to provide cert, server details in each kubectl command. 
+   - standard path $HOME/.kube/config
+   - KubeConfig has three sections:
+      - Clusters
+      - Contexts - It defines which existing user will be used to access which cluster
+      - Users 
+   - commands:
+      kubectl config view
+      kubectl config use-context <contextname> - to change default context
+
+
+11. KubeProxy vs Kubectl proxy 
+    - KubeProxy is used for communication between pods.
+    - kubectl proxy is a https service that will use config file to interact with kubeapi server
+
+12. API groups - in k8s all API's are grouped in groups and under that group we have resources.
+    - /apis [Named]
+      - API groups 
+          - /apps
+          - /extentions
+          - /networking.k8s.io
+          - /storage.k8s.io
+          - /authentication.k8s.io
+          - /certificates.k8s.io
+
+13. Authorization - which user has what access
+    - node - Authorize request coming from node
+    - attribute based access control ABAC - For this policy are created and assigned to user
+    - Role based access control RBAC - A role is created and it will be collection of policies.
+    - Webhook     - Authorization is done by third party    
+
+14. In Kube api server there is one parameter authorization mode. By default value is AllwaysAllow. You can configure authorization mode comma separated. If any mode failed then it get transfered to next authorization mode.  
+
+15. kube auth can-i create <resource> - to check do I have permission to perform this action
+
+16. Cluster roles and cluster role binding created for clusterspaced resources like nodes, csr etc.
+
+17. kubectl api-resources --namespaced=true
+
+18. clusterrole and clusterrolebinding are not part of any namepspace. they are cluster bounded.
+
+19 Two types of accounts
+   - User account - used by human like admin, developer.
+   - Service account - It is the Identity of a service. If any service wants to interact with K8s cluster then they will use service account like Jenkins, Prometheus
+   - By default K8s cluster creates a service account with name default.
+   - The pod is associated with service account. and as soon as pod get associated with service account. k8s automatically creates the token with expiry date and automatically mounts that within the pod at a particular location
+   - Tokens are created for service account for proving its Identity.
+   - To attach a service account with pod use serviceAccountName in pod manifest file
+
+20. kubectl create serviceaccount <name> - to create service account
+    kubectl create token <serviceaccountname> --duration 2h {by default token expiry is 1 hour}
+
+21. kubectl create secret docker-registry regCred --docker-server=<name> --docker-username=  --docker-password= --docker-email 
+    - these regCred will be used by node while pulling image from private docker registry\
+
+22. Security Context - Add securityContext at pod level then it will be apply to all containers in that pod. Plus we can also specify securityContext at container level.
+    - Security Context we define which user to use and what capabilities can be added.
+    - capabilities only available at container level not at pod level
+
+23. In k8s cluster, all pods and services can communicate with each other with out any routes add. 
+
+24. If we want to add a restriction like db pod can only be access from API pod not from frontend Pod then we can use network policy.
+
+25. Network Solutions that supports network policies -  Kube-router, rommana, Calico
+    Network Solutions that do not support policies - flannel
+
+26, Supported selectors in ingress and egress type of policy. 
+    - Pod selector
+    - Namepspace Selector
+    - IP Block selector
+
+27. Two new command line utilities to switch between namespaces and context. 
+    - kubectx
+    - kubens
+
+28. User can also create custom resource in k8s (CRD) and custom controllers.
+
+29. Advanced topic - Operator Framework

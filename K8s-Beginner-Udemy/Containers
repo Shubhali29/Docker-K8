@@ -47,3 +47,8 @@ Container Vs Images
 Note: A container only lives until a process inside it is active
 
 Note: Entrypoint provides the executable and CMD provides default arguments
+
+Note:
+  - Containers are isolated from other containers running on same machine by using namespace.
+  - The root user of container and root user of system are not same they have different privledge.
+  - If you want to add or remove some privledge from root user of container then use cap-add option or cap-drop option in docker run command.
